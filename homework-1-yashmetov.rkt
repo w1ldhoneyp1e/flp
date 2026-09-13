@@ -93,11 +93,16 @@
       [(< count 0) tail]
       [(empty? tail) result]
       [(> count 0) (go (sub1 count) (append result (list (first tail))) (rest tail))]
-      [(equal? count 0) (append tail result)]))
+      [else (append tail result)]))
   (go k empty lst))
 
 (define (split-on sep lst)
-  'todo)
+  (define (go result buffer tail)
+   (cond 
+    [(empty? tail) (append result (list buffer))]
+    [(equal? sep (first tail)) (go (append result (list buffer)) empty (rest tail))]
+    [else (go result (append buffer (list (first tail))) (rest tail))]))
+  (go empty empty lst))
 
 (check-equal? (index-of 3 '(1 3 5 3)) 1)
 (check-equal? (index-of 4 '(1 3 5)) #f)
@@ -113,11 +118,11 @@
 (check-equal? (rotate-left '(1 2 3) 0) '(1 2 3))
 (check-equal? (rotate-left '(1 2 3) 3) '(1 2 3))
 (check-equal? (rotate-left '(1 2 3) -1) '(1 2 3))
-; (check-equal? (split-on 0 '(1 2 0 3 0 0 4)) '((1 2) (3) () (4)))
-; (check-equal? (split-on 0 '(0)) '(() ()))
-; (check-equal? (split-on 0 '()) '(()))
-; (check-equal? (split-on 0 '(1 2)) '((1 2)))
-; (check-equal? (split-on #\newline (string->list "ok\nfail\n")) '((#\o #\k) (#\f #\a #\i #\l) ()))
+(check-equal? (split-on 0 '(1 2 0 3 0 0 4)) '((1 2) (3) () (4)))
+(check-equal? (split-on 0 '(0)) '(() ()))
+(check-equal? (split-on 0 '()) '(()))
+(check-equal? (split-on 0 '(1 2)) '((1 2)))
+(check-equal? (split-on #\newline (string->list "ok\nfail\n")) '((#\o #\k) (#\f #\a #\i #\l) ()))
 
 ;; ============================================================================
 ;; Задача 1.2. Параметр-аккумулятор
