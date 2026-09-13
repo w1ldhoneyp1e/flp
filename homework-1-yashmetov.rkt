@@ -87,8 +87,14 @@
     [(empty? a) (go empty (first b) a (rest b))]
     [else (go empty (first a) (rest a) b)]))
 
-(define (rotate-left lst k)
-  'todo)
+(define (rotate-left lst k) ; Дополнил условие: при отрицательных k возвращаю поданный список
+  (define (go count result tail)
+    (cond
+      [(< count 0) tail]
+      [(empty? tail) result]
+      [(> count 0) (go (sub1 count) (append result (list (first tail))) (rest tail))]
+      [(equal? count 0) (append tail result)]))
+  (go k empty lst))
 
 (define (split-on sep lst)
   'todo)
@@ -103,9 +109,10 @@
 (check-equal? (merge-sorted '(1 4 6) '(2 3 7 9)) '(1 2 3 4 6 7 9))
 (check-equal? (merge-sorted '() '(5)) '(5))
 (check-equal? (merge-sorted '(2 2) '(2)) '(2 2 2))
-; (check-equal? (rotate-left '(1 2 3 4 5) 2) '(3 4 5 1 2))
-; (check-equal? (rotate-left '(1 2 3) 0) '(1 2 3))
-; (check-equal? (rotate-left '(1 2 3) 3) '(1 2 3))
+(check-equal? (rotate-left '(1 2 3 4 5) 2) '(3 4 5 1 2))
+(check-equal? (rotate-left '(1 2 3) 0) '(1 2 3))
+(check-equal? (rotate-left '(1 2 3) 3) '(1 2 3))
+(check-equal? (rotate-left '(1 2 3) -1) '(1 2 3))
 ; (check-equal? (split-on 0 '(1 2 0 3 0 0 4)) '((1 2) (3) () (4)))
 ; (check-equal? (split-on 0 '(0)) '(() ()))
 ; (check-equal? (split-on 0 '()) '(()))
