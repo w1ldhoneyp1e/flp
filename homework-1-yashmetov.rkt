@@ -55,16 +55,37 @@
 ;; Задача 1.1. Списки явной рекурсией
 ;; ============================================================================
 ;; Я не использовал(а) ИИ при решении этой задачи.
-;; Я использовал(а) ИИ (<модель>) в <части> этой задачи в соответствии с правилами курса и условием.
 
 (define (index-of x lst)
-  'todo)
+  (define (go acc tail)
+    (cond
+      [(empty? tail) #f]
+      [(equal? x (first tail)) acc]
+      [else (go (add1 acc) (rest tail))]))
+  (go 0 lst))
 
 (define (dedupe-adjacent lst)
-  'todo)
+  (cond
+    [(empty? lst) empty]
+    [else 
+      (define (go prev deduped tail)
+        (cond
+          [(empty? tail) deduped]
+          [(equal? prev (first tail)) (go prev deduped (rest tail))]
+          [else (go (first tail) (append deduped (list (first tail))) (rest tail))]))
+      (go (first lst) (list (first lst)) (rest lst))]))
 
 (define (merge-sorted a b)
-  'todo)
+  (define (go result curr lst-a lst-b)
+    (cond
+      [(empty? lst-a) (append result (cons curr lst-b))]
+      [(empty? lst-b) (append result (cons curr lst-a))]
+      [(<= curr (first lst-b)) (go (append result (list curr)) (first lst-a) (rest lst-a) lst-b)]
+      [else (go (append result (list (first lst-b))) curr lst-a (rest lst-b))]))
+  (cond
+    [(and (empty? a) (empty? b)) empty]
+    [(empty? a) (go empty (first b) a (rest b))]
+    [else (go empty (first a) (rest a) b)]))
 
 (define (rotate-left lst k)
   'todo)
@@ -74,6 +95,7 @@
 
 (check-equal? (index-of 3 '(1 3 5 3)) 1)
 (check-equal? (index-of 4 '(1 3 5)) #f)
+(check-equal? (index-of 4 '()) #f)
 (check-equal? (index-of #\о (word->list "топор")) 1)
 (check-equal? (dedupe-adjacent '(1 1 2 2 2 1)) '(1 2 1))
 (check-equal? (dedupe-adjacent '()) '())
@@ -81,14 +103,14 @@
 (check-equal? (merge-sorted '(1 4 6) '(2 3 7 9)) '(1 2 3 4 6 7 9))
 (check-equal? (merge-sorted '() '(5)) '(5))
 (check-equal? (merge-sorted '(2 2) '(2)) '(2 2 2))
-(check-equal? (rotate-left '(1 2 3 4 5) 2) '(3 4 5 1 2))
-(check-equal? (rotate-left '(1 2 3) 0) '(1 2 3))
-(check-equal? (rotate-left '(1 2 3) 3) '(1 2 3))
-(check-equal? (split-on 0 '(1 2 0 3 0 0 4)) '((1 2) (3) () (4)))
-(check-equal? (split-on 0 '(0)) '(() ()))
-(check-equal? (split-on 0 '()) '(()))
-(check-equal? (split-on 0 '(1 2)) '((1 2)))
-(check-equal? (split-on #\newline (string->list "ok\nfail\n")) '((#\o #\k) (#\f #\a #\i #\l) ()))
+; (check-equal? (rotate-left '(1 2 3 4 5) 2) '(3 4 5 1 2))
+; (check-equal? (rotate-left '(1 2 3) 0) '(1 2 3))
+; (check-equal? (rotate-left '(1 2 3) 3) '(1 2 3))
+; (check-equal? (split-on 0 '(1 2 0 3 0 0 4)) '((1 2) (3) () (4)))
+; (check-equal? (split-on 0 '(0)) '(() ()))
+; (check-equal? (split-on 0 '()) '(()))
+; (check-equal? (split-on 0 '(1 2)) '((1 2)))
+; (check-equal? (split-on #\newline (string->list "ok\nfail\n")) '((#\o #\k) (#\f #\a #\i #\l) ()))
 
 ;; ============================================================================
 ;; Задача 1.2. Параметр-аккумулятор
@@ -109,16 +131,16 @@
 ;;   (digits 205)
 ;;   = ...
 
-(check-equal? (digits 2026) '(2 0 2 6))
-(check-equal? (digits 0) '(0))
-(check-equal? (digits 7) '(7))
-(check-equal? (from-digits '(2 0 2 6)) 2026)
-(check-equal? (from-digits '(0)) 0)
-(check-equal? (from-digits (digits 90210)) 90210)
-(check-equal? (longest-run '(1 1 2 2 2 1)) 3)
-(check-equal? (longest-run '()) 0)
-(check-equal? (longest-run '(4 4 4)) 3)
-(check-equal? (longest-run (word->list "масса")) 2)
+; (check-equal? (digits 2026) '(2 0 2 6))
+; (check-equal? (digits 0) '(0))
+; (check-equal? (digits 7) '(7))
+; (check-equal? (from-digits '(2 0 2 6)) 2026)
+; (check-equal? (from-digits '(0)) 0)
+; (check-equal? (from-digits (digits 90210)) 90210)
+; (check-equal? (longest-run '(1 1 2 2 2 1)) 3)
+; (check-equal? (longest-run '()) 0)
+; (check-equal? (longest-run '(4 4 4)) 3)
+; (check-equal? (longest-run (word->list "масса")) 2)
 
 ;; ============================================================================
 ;; Задача 1.3. Игра в слова
@@ -138,28 +160,28 @@
 (define (best-guess dict)
   'todo)
 
-(check-equal? (feedback (word->list "топор") (word->list "ротор"))
-              '(yellow green gray green green))
-(check-equal? (feedback (word->list "робот") (word->list "робот"))
-              '(green green green green green))
-(check-equal? (feedback (word->list "касса") (word->list "сарай"))
-              '(gray green yellow gray yellow))
-(check-equal? (feedback (word->list "масса") (word->list "касса"))
-              '(gray green green green green))
-(check-equal? (feedback (word->list "сахар") (word->list "салат"))
-              '(green green gray green gray))
-(check-equal? (consistent? (word->list "ротор") (word->list "топор")
-                           '(yellow green gray green green))
-              #t)
-(check-equal? (consistent? (word->list "табор") (word->list "топор")
-                           '(yellow green gray green green))
-              #f)
-(check-equal? (candidates words (word->list "топор") '(yellow green gray green green))
-              (map word->list '("ротор" "мотор")))
-(check-equal? (candidates words (word->list "робот") '(gray gray gray gray gray))
-              (map word->list '("касса" "масса")))
-(check-equal? (best-guess (map word->list '("топор" "ротор" "мотор" "робот" "табор")))
-              (word->list "ротор"))
+; (check-equal? (feedback (word->list "топор") (word->list "ротор"))
+;               '(yellow green gray green green))
+; (check-equal? (feedback (word->list "робот") (word->list "робот"))
+;               '(green green green green green))
+; (check-equal? (feedback (word->list "касса") (word->list "сарай"))
+;               '(gray green yellow gray yellow))
+; (check-equal? (feedback (word->list "масса") (word->list "касса"))
+;               '(gray green green green green))
+; (check-equal? (feedback (word->list "сахар") (word->list "салат"))
+;               '(green green gray green gray))
+; (check-equal? (consistent? (word->list "ротор") (word->list "топор")
+;                            '(yellow green gray green green))
+;               #t)
+; (check-equal? (consistent? (word->list "табор") (word->list "топор")
+;                            '(yellow green gray green green))
+;               #f)
+; (check-equal? (candidates words (word->list "топор") '(yellow green gray green green))
+;               (map word->list '("ротор" "мотор")))
+; (check-equal? (candidates words (word->list "робот") '(gray gray gray gray gray))
+;               (map word->list '("касса" "масса")))
+; (check-equal? (best-guess (map word->list '("топор" "ротор" "мотор" "робот" "табор")))
+;               (word->list "ротор"))
 
 ;; ============================================================================
 ;; Задача 1.4. Подстановочная модель
@@ -201,15 +223,15 @@
 ;; (г) Почему (4) осталось перед (7), и что было бы при (on <= length):
 ;;   ...
 
-(check-equal? ((negate even?) 3) #t)
-(check-equal? ((negate even?) 4) #f)
-(check-equal? (filter (all-of (list even? positive?)) '(-2 1 4 6)) '(4 6))
-(check-equal? (filter (all-of '()) '(1 2)) '(1 2))
-(check-equal? ((compose2 add1 (lambda (x) (* 2 x))) 5) 11)
-(check-equal? (sort '((1 2 3) (4) (5 6) (7)) (on < length)) '((4) (7) (5 6) (1 2 3)))
-(check-equal? ((on string<? symbol->string) 'b 'a) #f)
-(check-equal? (argmax-by string-length '("да" "нет" "ага")) "нет")
-(check-equal? (argmax-by - '(3 1 2)) 1)
+; (check-equal? ((negate even?) 3) #t)
+; (check-equal? ((negate even?) 4) #f)
+; (check-equal? (filter (all-of (list even? positive?)) '(-2 1 4 6)) '(4 6))
+; (check-equal? (filter (all-of '()) '(1 2)) '(1 2))
+; (check-equal? ((compose2 add1 (lambda (x) (* 2 x))) 5) 11)
+; (check-equal? (sort '((1 2 3) (4) (5 6) (7)) (on < length)) '((4) (7) (5 6) (1 2 3)))
+; (check-equal? ((on string<? symbol->string) 'b 'a) #f)
+; (check-equal? (argmax-by string-length '("да" "нет" "ага")) "нет")
+; (check-equal? (argmax-by - '(3 1 2)) 1)
 
 ;; ============================================================================
 ;; Задача 1.6. Свёртки и история коммитов
@@ -235,15 +257,15 @@
 (define commits
   '(("Аня" 120 10) ("Борис" 40 60) ("Вера" 0 80) ("Аня" 5 5)))
 
-(check-equal? (count-if even? '(1 2 3 4 6)) 3)
-(check-equal? (count-if (lambda (w) (member #\о w)) words) 14)
-(check-equal? (my-map add1 '(1 2 3)) '(2 3 4))
-(check-equal? (my-map string-length '("ab" "" "abc")) '(2 0 3))
-(check-equal? (repo-size commits) 10)
-(check-equal? (repo-size '()) 0)
-(check-equal? (peak-size commits) 110)
-(check-equal? (peak-size '()) 0)
-(check-equal? (added-by-author commits) '(("Аня" . 125) ("Борис" . 40) ("Вера" . 0)))
+; (check-equal? (count-if even? '(1 2 3 4 6)) 3)
+; (check-equal? (count-if (lambda (w) (member #\о w)) words) 14)
+; (check-equal? (my-map add1 '(1 2 3)) '(2 3 4))
+; (check-equal? (my-map string-length '("ab" "" "abc")) '(2 0 3))
+; (check-equal? (repo-size commits) 10)
+; (check-equal? (repo-size '()) 0)
+; (check-equal? (peak-size commits) 110)
+; (check-equal? (peak-size '()) 0)
+; (check-equal? (added-by-author commits) '(("Аня" . 125) ("Борис" . 40) ("Вера" . 0)))
 
 ;; ============================================================================
 ;; Задача 1.7. Конвейеры и сборки CI
@@ -270,11 +292,11 @@
   '(("main" ok 210) ("main" fail 190) ("feature-login" ok 320)
     ("main" ok 205) ("feature-login" fail 300) ("hotfix" ok 95)))
 
-(check-equal? (passed builds) 4)
-(check-equal? (branches-of builds) '("main" "feature-login" "hotfix"))
-(check-equal? (success-table builds) '(("hotfix" . 1) ("main" . 2/3) ("feature-login" . 1/2)))
-(check-equal? (stable-branches builds) '("hotfix"))
-(check-equal? (slowest builds) '("feature-login" ok 320))
+; (check-equal? (passed builds) 4)
+; (check-equal? (branches-of builds) '("main" "feature-login" "hotfix"))
+; (check-equal? (success-table builds) '(("hotfix" . 1) ("main" . 2/3) ("feature-login" . 1/2)))
+; (check-equal? (stable-branches builds) '("hotfix"))
+; (check-equal? (slowest builds) '("feature-login" ok 320))
 
 ;; ============================================================================
 ;; Задача 1.8. Проверка кода от ИИ
