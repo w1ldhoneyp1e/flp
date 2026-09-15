@@ -128,31 +128,53 @@
 ;; Задача 1.2. Параметр-аккумулятор
 ;; ============================================================================
 ;; Я не использовал(а) ИИ при решении этой задачи.
-;; Я использовал(а) ИИ (<модель>) в <части> этой задачи в соответствии с правилами курса и условием.
 
 (define (digits n)
-  'todo)
+  (define (go result tail)
+    (define head (quotient tail 10))
+    (define last (remainder tail 10))
+    (cond
+      [(and (equal? head 0) (equal? last 0)) result]
+      [else (go (cons last result) head)]))
+  (cond
+    [(equal? n 0) '(0)]
+    [else (go empty n)]))
 
 (define (from-digits lst)
-  'todo)
+  (define (go result idx tail)
+    (cond
+      [(empty? tail) result]
+      [else (go (+ (* result 10) (first tail)) (add1 idx) (rest tail))]))
+  (go 0 0 lst))
 
 (define (longest-run lst)
-  'todo)
+  (define (go greatest last-count last-ch tail)
+    (cond
+      [(empty? tail) greatest]
+      [(equal? last-ch (first tail)) 
+        (define new-count (add1 last-count))
+        (cond
+          [(> new-count greatest) (go new-count new-count last-ch (rest tail))]
+          [else (go greatest new-count (first tail) (rest tail))])]
+      [else (go greatest 1 (first tail) (rest tail))]))
+    (cond
+      [(empty? lst) 0]
+      [else (go 1 1 (first lst) (rest lst))]))
 
 ;; (г) Вычисление (digits 205) по подстановочной модели:
 ;;   (digits 205)
 ;;   = ...
 
-; (check-equal? (digits 2026) '(2 0 2 6))
-; (check-equal? (digits 0) '(0))
-; (check-equal? (digits 7) '(7))
-; (check-equal? (from-digits '(2 0 2 6)) 2026)
-; (check-equal? (from-digits '(0)) 0)
-; (check-equal? (from-digits (digits 90210)) 90210)
-; (check-equal? (longest-run '(1 1 2 2 2 1)) 3)
-; (check-equal? (longest-run '()) 0)
-; (check-equal? (longest-run '(4 4 4)) 3)
-; (check-equal? (longest-run (word->list "масса")) 2)
+(check-equal? (digits 2026) '(2 0 2 6))
+(check-equal? (digits 0) '(0))
+(check-equal? (digits 7) '(7))
+(check-equal? (from-digits '(2 0 2 6)) 2026)
+(check-equal? (from-digits '(0)) 0)
+(check-equal? (from-digits (digits 90210)) 90210)
+(check-equal? (longest-run '(1 1 2 2 2 1)) 3)
+(check-equal? (longest-run '()) 0)
+(check-equal? (longest-run '(4 4 4)) 3)
+(check-equal? (longest-run (word->list "масса")) 2)
 
 ;; ============================================================================
 ;; Задача 1.3. Игра в слова
