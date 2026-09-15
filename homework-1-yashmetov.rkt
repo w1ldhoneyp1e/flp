@@ -195,10 +195,45 @@
 ;; Задача 1.3. Игра в слова
 ;; ============================================================================
 ;; Я не использовал(а) ИИ при решении этой задачи.
-;; Я использовал(а) ИИ (<модель>) в <части> этой задачи в соответствии с правилами курса и условием.
 
 (define (feedback guess answer)
-  'todo)
+  (define (get-greened-and-bank bank new-guess guess-rest answer-rest)
+    (cond
+      [(and 
+        (empty? guess-rest) 
+        (empty? answer-rest)) (values new-guess bank)]
+      [(equal? (first guess-rest) (first answer-rest)) 
+        (get-greened-and-bank 
+          bank 
+          (append new-guess '(green)) 
+          (rest guess-rest) 
+          (rest answer-rest))]
+      [else 
+        (get-greened-and-bank 
+          (cons (first answer-rest) bank) 
+          (append new-guess (list (first guess-rest)))
+          (rest guess-rest)
+          (rest answer-rest))]))
+  (define-values (greened-guess yellow-bank)
+    (get-greened-and-bank empty empty guess answer))
+  (define (mark-yellow-gray result tail bank)
+      (cond
+        [(empty? tail) result]
+        [(equal? (first tail) 'green) 
+          (mark-yellow-gray 
+            (append result '(green)) 
+            (rest tail) 
+            bank)]
+        [(member (first tail) bank) 
+          (mark-yellow-gray 
+            (append result '(yellow)) 
+            (rest tail) 
+            (remove (first tail) bank))]
+        [else (mark-yellow-gray 
+          (append result '(gray)) 
+          (rest tail) 
+          bank)]))
+  (mark-yellow-gray '() greened-guess yellow-bank))
 
 (define (consistent? word guess fb)
   'todo)
@@ -209,16 +244,22 @@
 (define (best-guess dict)
   'todo)
 
-; (check-equal? (feedback (word->list "топор") (word->list "ротор"))
-;               '(yellow green gray green green))
-; (check-equal? (feedback (word->list "робот") (word->list "робот"))
-;               '(green green green green green))
-; (check-equal? (feedback (word->list "касса") (word->list "сарай"))
-;               '(gray green yellow gray yellow))
-; (check-equal? (feedback (word->list "масса") (word->list "касса"))
-;               '(gray green green green green))
-; (check-equal? (feedback (word->list "сахар") (word->list "салат"))
-;               '(green green gray green gray))
+(check-equal? (feedback (word->list "топор") (word->list "ротор"))
+              '(yellow green gray green green))
+(check-equal? (feedback (word->list "робот") (word->list "робот"))
+              '(green green green green green))
+(check-equal? (feedback (word->list "касса") (word->list "сарай"))
+              '(gray green yellow gray yellow))
+(check-equal? (feedback (word->list "масса") (word->list "касса"))
+              '(gray green green green green))
+(check-equal? (feedback (word->list "сахар") (word->list "салат"))
+              '(green green gray green gray))
+(check-equal? (feedback (word->list "aaaaa") (word->list "aaaaa"))
+              '(green green green green green))
+(check-equal? (feedback (word->list "baaaa") (word->list "aaaab"))
+              '(yellow green green green yellow))
+(check-equal? (feedback (word->list "baaaa") (word->list "caaab"))
+              '(yellow green green green gray))
 ; (check-equal? (consistent? (word->list "ротор") (word->list "топор")
 ;                            '(yellow green gray green green))
 ;               #t)
