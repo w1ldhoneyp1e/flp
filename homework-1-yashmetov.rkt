@@ -163,7 +163,22 @@
 
 ;; (г) Вычисление (digits 205) по подстановочной модели:
 ;;   (digits 205)
-;;   = ...
+;;   = (go empty 205)
+
+;;   = (go (cons (remainder 205 10) '()) (quotient 205 10)) 
+;;   = (go (cons 5 '()) 20) 
+;;   = (go '(5) 20)
+
+;;   = (go (cons (remainder 20 10) '()) (quotient 20 10)) 
+;;   = (go (cons 0 '(5)) 2) 
+;;   = (go '(0 5) 2)
+
+;;   = (go (cons (remainder 2 10) '()) (quotient 2 10)) 
+;;   = (go (cons 2 '()) 0) 
+;;   = (go '(2 0 5) 0)
+
+;;   По первой ветке в go
+;;   = '(2 0 5)
 
 (check-equal? (digits 2026) '(2 0 2 6))
 (check-equal? (digits 0) '(0))
