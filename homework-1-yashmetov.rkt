@@ -353,10 +353,10 @@
 ;; Задача 1.5. Функции как значения
 ;; ============================================================================
 ;; Я не использовал(а) ИИ при решении этой задачи.
-;; Я использовал(а) ИИ (<модель>) в <части> этой задачи в соответствии с правилами курса и условием.
 
 (define (negate p)
-  'todo)
+  (lambda (x)
+    (not (p x))))
 
 (define (all-of ps)
   'todo)
@@ -373,8 +373,8 @@
 ;; (г) Почему (4) осталось перед (7), и что было бы при (on <= length):
 ;;   ...
 
-; (check-equal? ((negate even?) 3) #t)
-; (check-equal? ((negate even?) 4) #f)
+(check-equal? ((negate even?) 3) #t)
+(check-equal? ((negate even?) 4) #f)
 ; (check-equal? (filter (all-of (list even? positive?)) '(-2 1 4 6)) '(4 6))
 ; (check-equal? (filter (all-of '()) '(1 2)) '(1 2))
 ; (check-equal? ((compose2 add1 (lambda (x) (* 2 x))) 5) 11)
