@@ -254,18 +254,17 @@
   
   (argmax
     ;; из fb-lst-lst сделать массив длин, где длина - количество уникальных подсказок
-    (map 
-      (lambda (fb-lst)
-        (length 
-          (filter-not
-            (lambda (fb)
-              (member fb (remove fb fb-lst)))
-            fb-lst))
-      (lambda (word-answer) ; Список подсказок по всем возможным answer fb-lst-lst
-        (map (lambda (word-guess) ; Список подсказок по одному answer fb-lst
-          (feedback word-guess word-answer)
-          dict)
-        dict))))
+    (lambda (dict-word)
+      (define fb-lst ; Формируем список фидбеков для определенного answer для каждого guess
+        (map (lambda (word-guess)
+          (feedback word-guess dict-word))
+        dict))
+
+      (length 
+        (filter-not
+          (lambda (fb)
+            (member fb (remove fb fb-lst)))
+          fb-lst)))
     dict))
 
 (check-equal? (feedback (word->list "топор") (word->list "ротор"))
