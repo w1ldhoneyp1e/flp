@@ -236,13 +236,37 @@
   (mark-yellow-gray '() greened-guess yellow-bank))
 
 (define (consistent? word guess fb)
-  'todo)
+  (define suggested-fb (feedback guess word))
+  (equal? suggested-fb fb))
 
 (define (candidates dict guess fb)
-  'todo)
+  (filter
+    (lambda (word)
+      (equal? (feedback guess word) fb))
+    dict))
 
 (define (best-guess dict)
-  'todo)
+  ; Найти такой word-answer из dict, для которого предполагая, что оно загадано и
+  ;   для каждого word-guess из dict получаем подсказку
+  ;   из полученного fb-lst-lst, для каждого fb-lst
+  ;     находим fb-lst с максимальным количеством различных списков цветов
+
+  
+  (argmax
+    ;; из fb-lst-lst сделать массив длин, где длина - количество уникальных подсказок
+    (map 
+      (lambda (fb-lst)
+        (length 
+          (filter-not
+            (lambda (fb)
+              (member fb (remove fb fb-lst)))
+            fb-lst))
+      (lambda (word-answer) ; Список подсказок по всем возможным answer fb-lst-lst
+        (map (lambda (word-guess) ; Список подсказок по одному answer fb-lst
+          (feedback word-guess word-answer)
+          dict)
+        dict))))
+    dict))
 
 (check-equal? (feedback (word->list "топор") (word->list "ротор"))
               '(yellow green gray green green))
@@ -260,18 +284,18 @@
               '(yellow green green green yellow))
 (check-equal? (feedback (word->list "baaaa") (word->list "caaab"))
               '(yellow green green green gray))
-; (check-equal? (consistent? (word->list "ротор") (word->list "топор")
-;                            '(yellow green gray green green))
-;               #t)
-; (check-equal? (consistent? (word->list "табор") (word->list "топор")
-;                            '(yellow green gray green green))
-;               #f)
-; (check-equal? (candidates words (word->list "топор") '(yellow green gray green green))
-;               (map word->list '("ротор" "мотор")))
-; (check-equal? (candidates words (word->list "робот") '(gray gray gray gray gray))
-;               (map word->list '("касса" "масса")))
-; (check-equal? (best-guess (map word->list '("топор" "ротор" "мотор" "робот" "табор")))
-;               (word->list "ротор"))
+(check-equal? (consistent? (word->list "ротор") (word->list "топор")
+                           '(yellow green gray green green))
+              #t)
+(check-equal? (consistent? (word->list "табор") (word->list "топор")
+                           '(yellow green gray green green))
+              #f)
+(check-equal? (candidates words (word->list "топор") '(yellow green gray green green))
+              (map word->list '("ротор" "мотор")))
+(check-equal? (candidates words (word->list "робот") '(gray gray gray gray gray))
+              (map word->list '("касса" "масса")))
+(check-equal? (best-guess (map word->list '("топор" "ротор" "мотор" "робот" "табор")))
+              (word->list "ротор"))
 
 ;; ============================================================================
 ;; Задача 1.4. Подстановочная модель
