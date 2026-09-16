@@ -300,12 +300,49 @@
 ;; Задача 1.4. Подстановочная модель
 ;; ============================================================================
 ;; Я не использовал(а) ИИ при решении этой задачи.
-;; Я использовал(а) ИИ (<модель>) в <части> этой задачи в соответствии с правилами курса и условием.
 ;;
 ;; (а) (my-length (merge-sorted a b)) = (+ (my-length a) (my-length b))
 ;;
+;; Длина списка явной рекурсией (для задачи 1.4).
+; (define (my-length lst)
+;   (cond
+;     [(empty? lst) 0]
+;     [else (+ 1 (my-length (rest lst)))]))
+;;
+; (define (merge-sorted a b)
+;  (define (go result curr lst-a lst-b)
+;    (cond
+;      [(empty? lst-a) (append result (cons curr lst-b))]
+;      [(empty? lst-b) (append result (cons curr lst-a))]
+;      [(<= curr (first lst-b)) (go (append result (list curr)) (first lst-a) (rest lst-a) lst-b)]
+;      [else (go (append result (list (first lst-b))) curr lst-a (rest lst-b))]))
+;  (cond
+;    [(and (empty? a) (empty? b)) empty]
+;    [(empty? a) (go empty (first b) a (rest b))]
+;    [else (go empty (first a) (rest a) b)]))
+;;
 ;; Доказательство:
-;;   ...
+;;   (my-length (merge-sorted a b)) = (+ (my-length a) (my-length b))
+;;     
+;;   1. Случай a = empty b = empty:
+;;      (my-length '()) = (+ 0 0)
+;;      '0 = '0
+;;     
+;;   2. Случай a = empty b != empty:
+;;      (my-length b) = (+ 0 (my-length b))
+;;      (length b) = (length b)
+;;     
+;;   3. Случай a != empty b = empty:
+;;      Аналогично п.2
+;;      (length a) = (length a)
+;;     
+;;   4. Случай a != empty b != empty:
+;;      (my-length (go empty (first a) (rest a) b)) = (+ (my-length a) (my-length b))
+;;      (my-length (go empty (first a) (rest a) b)) = (+ (my-length a) (my-length b))
+;;      Для go:
+;;      (my-length (go result current a b)) = (+ (my-length result) 1 (my-length lst-a) (my-length lst-b))
+;;     
+;;   (my-length (merge-sorted a b)) = (+ (my-length a) (my-length b))
 ;;
 ;; (б) (dedupe-adjacent (dedupe-adjacent lst)) = (dedupe-adjacent lst)
 ;;
