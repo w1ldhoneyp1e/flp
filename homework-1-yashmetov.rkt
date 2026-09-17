@@ -404,32 +404,91 @@
 ;; Я использовал(а) ИИ (<модель>) в <части> этой задачи в соответствии с правилами курса и условием.
 
 (define (count-if p lst)
-  'todo)
+  (foldl
+    (lambda (elem amount)
+      (cond
+        [(p elem) (add1 amount)]
+        [else amount]))
+    0
+    lst))
 
 (define (my-map f lst)
-  'todo)
+  (foldl
+    (lambda (elem result)
+      (append result (list (f elem))))
+    empty
+    lst))
 
 (define (repo-size commits)
-  'todo)
+  (foldl
+    (lambda (commit result)
+      (- 
+        (+ result (commit-added commit))
+        (commit-deleted commit)))
+    0
+    commits))
 
 (define (peak-size commits)
-  'todo)
+  (define amount-and-peak (foldl
+    (lambda (commit acc)
+      (define result (first acc))
+      (define max (second acc))
+      (define curr (- 
+        (+ result (commit-added commit))
+        (commit-deleted commit)))
+      (cond
+        [(> curr max) (list curr curr)]
+        [else (list curr max)]))
+    '(0 0)
+    commits))
+
+  (second amount-and-peak))
+
+(define (same-author commit stat)
+  (equal? (commit-author commit) (stat-author stat)))
+(define (stat-author stat) (car stat))
+(define (stat-added stat) (cdr stat))
 
 (define (added-by-author commits)
-  'todo)
+  (foldl
+    (lambda (commit stats)
+      (cond
+        [(ormap ; Если есть в stats
+          (lambda (stat)
+            (same-author commit stat))
+          stats)
+          (map ; Мутируем
+            (lambda (stat)
+              (cond
+                [(same-author commit stat) 
+                (cons 
+                  (commit-author commit) 
+                  (+ 
+                    (commit-added commit) 
+                    (stat-added stat)))]
+                [else stat]))
+            stats)]
+        [else (append ; Иначе добавляем в конец
+                stats 
+                (list 
+                  (cons 
+                    (commit-author commit) 
+                    (commit-added commit))))]))
+    empty
+    commits))
 
 (define commits
   '(("Аня" 120 10) ("Борис" 40 60) ("Вера" 0 80) ("Аня" 5 5)))
 
-; (check-equal? (count-if even? '(1 2 3 4 6)) 3)
-; (check-equal? (count-if (lambda (w) (member #\о w)) words) 14)
-; (check-equal? (my-map add1 '(1 2 3)) '(2 3 4))
-; (check-equal? (my-map string-length '("ab" "" "abc")) '(2 0 3))
-; (check-equal? (repo-size commits) 10)
-; (check-equal? (repo-size '()) 0)
-; (check-equal? (peak-size commits) 110)
-; (check-equal? (peak-size '()) 0)
-; (check-equal? (added-by-author commits) '(("Аня" . 125) ("Борис" . 40) ("Вера" . 0)))
+(check-equal? (count-if even? '(1 2 3 4 6)) 3)
+(check-equal? (count-if (lambda (w) (member #\о w)) words) 14)
+(check-equal? (my-map add1 '(1 2 3)) '(2 3 4))
+(check-equal? (my-map string-length '("ab" "" "abc")) '(2 0 3))
+(check-equal? (repo-size commits) 10)
+(check-equal? (repo-size '()) 0)
+(check-equal? (peak-size commits) 110)
+(check-equal? (peak-size '()) 0)
+(check-equal? (added-by-author commits) '(("Аня" . 125) ("Борис" . 40) ("Вера" . 0)))
 
 ;; ============================================================================
 ;; Задача 1.7. Конвейеры и сборки CI
