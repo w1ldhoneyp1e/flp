@@ -359,7 +359,11 @@
     (not (p x))))
 
 (define (all-of ps)
-  'todo)
+  (lambda (smth)
+    (andmap
+      (lambda (p)
+        (p smth))
+      ps)))
 
 (define (compose2 f g)
   'todo)
@@ -375,8 +379,8 @@
 
 (check-equal? ((negate even?) 3) #t)
 (check-equal? ((negate even?) 4) #f)
-; (check-equal? (filter (all-of (list even? positive?)) '(-2 1 4 6)) '(4 6))
-; (check-equal? (filter (all-of '()) '(1 2)) '(1 2))
+(check-equal? (filter (all-of (list even? positive?)) '(-2 1 4 6)) '(4 6))
+(check-equal? (filter (all-of '()) '(1 2)) '(1 2))
 ; (check-equal? ((compose2 add1 (lambda (x) (* 2 x))) 5) 11)
 ; (check-equal? (sort '((1 2 3) (4) (5 6) (7)) (on < length)) '((4) (7) (5 6) (1 2 3)))
 ; (check-equal? ((on string<? symbol->string) 'b 'a) #f)
