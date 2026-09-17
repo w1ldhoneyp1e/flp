@@ -366,26 +366,36 @@
       ps)))
 
 (define (compose2 f g)
-  'todo)
+  (lambda (x)
+    (f (g x))))
 
 (define (on cmp key)
-  'todo)
+  (lambda (a b)
+    (cmp (key a) (key b))))
 
 (define (argmax-by f lst)
-  'todo)
+  (foldl
+    (lambda (elem max)
+      (cond
+        [(> (f elem)(f max)) elem]
+        [else max]))
+    (first lst)
+    lst))
 
 ;; (г) Почему (4) осталось перед (7), и что было бы при (on <= length):
-;;   ...
+;;   Потому что сравнение строгое и при одинаковом length получаем #f. Смещения не происходит,
+;;   а в изначальном списке (4) левее (7). Если поменять их местами, то и в результате они поменяются.
+;;   Если заменить на <=, то будет #t при равных length, тогда значения поменяются местами.
 
 (check-equal? ((negate even?) 3) #t)
 (check-equal? ((negate even?) 4) #f)
 (check-equal? (filter (all-of (list even? positive?)) '(-2 1 4 6)) '(4 6))
 (check-equal? (filter (all-of '()) '(1 2)) '(1 2))
-; (check-equal? ((compose2 add1 (lambda (x) (* 2 x))) 5) 11)
-; (check-equal? (sort '((1 2 3) (4) (5 6) (7)) (on < length)) '((4) (7) (5 6) (1 2 3)))
-; (check-equal? ((on string<? symbol->string) 'b 'a) #f)
-; (check-equal? (argmax-by string-length '("да" "нет" "ага")) "нет")
-; (check-equal? (argmax-by - '(3 1 2)) 1)
+(check-equal? ((compose2 add1 (lambda (x) (* 2 x))) 5) 11)
+(check-equal? (sort '((1 2 3) (4) (5 6) (7)) (on < length)) '((4) (7) (5 6) (1 2 3)))
+(check-equal? ((on string<? symbol->string) 'b 'a) #f)
+(check-equal? (argmax-by string-length '("да" "нет" "ага")) "нет")
+(check-equal? (argmax-by - '(3 1 2)) 1)
 
 ;; ============================================================================
 ;; Задача 1.6. Свёртки и история коммитов
