@@ -494,16 +494,68 @@
 ;; Задача 1.7. Конвейеры и сборки CI
 ;; ============================================================================
 ;; Я не использовал(а) ИИ при решении этой задачи.
-;; Я использовал(а) ИИ (<модель>) в <части> этой задачи в соответствии с правилами курса и условием.
 
 (define (passed builds)
-  'todo)
+  (length
+    (filter
+      (lambda (build)
+        (equal? (build-status build) 'ok))
+      builds)))
 
 (define (branches-of builds)
-  'todo)
+  (map
+    build-branch
+    (remove-duplicates
+      builds
+      (lambda (a b)
+        (equal? (build-branch a) (build-branch b))))))
 
+(define (same-branch a b)
+  (equal? (build-branch a) (build-branch b)))
+
+;; Отобразить в формате (branch succ/all)
 (define (success-table builds)
-  'todo)
+  (define (form-stat build default-succ default-all)
+    (list 
+      (build-branch build)
+      (cond
+        [(equal? 'ok (build-status build)) (add1 default-succ)]
+        [else default-succ])
+      (add1 default-all)))
+
+  (define (mutate-stat build stat)
+    (cond
+      [(same-branch build stat) 
+        (form-stat build (second stat) (third stat))]
+      [else stat]))
+  
+  (define stats (foldl
+    (lambda (build stats)
+      (cond
+        [(ormap ; Если есть в stats
+          (lambda (stat)
+            (same-branch build stat))
+          stats)
+          (map ; Мутируем
+            (lambda (stat)
+              (mutate-stat build stat))
+            stats)]
+        [else (append ; Иначе добавляем в конец
+                stats 
+                (list 
+                  (form-stat build 0 0)))]))
+    empty
+    builds))
+    
+    (sort
+      (map
+        (lambda (stat)
+          (cons
+            (build-branch stat)
+            (/ (second stat) (third stat))))
+        stats)
+      (lambda (a b)
+        (> (cdr a) (cdr b)))))
 
 (define (stable-branches builds)
   'todo)
@@ -515,9 +567,9 @@
   '(("main" ok 210) ("main" fail 190) ("feature-login" ok 320)
     ("main" ok 205) ("feature-login" fail 300) ("hotfix" ok 95)))
 
-; (check-equal? (passed builds) 4)
-; (check-equal? (branches-of builds) '("main" "feature-login" "hotfix"))
-; (check-equal? (success-table builds) '(("hotfix" . 1) ("main" . 2/3) ("feature-login" . 1/2)))
+(check-equal? (passed builds) 4)
+(check-equal? (branches-of builds) '("main" "feature-login" "hotfix"))
+(check-equal? (success-table builds) '(("hotfix" . 1) ("main" . 2/3) ("feature-login" . 1/2)))
 ; (check-equal? (stable-branches builds) '("hotfix"))
 ; (check-equal? (slowest builds) '("feature-login" ok 320))
 
